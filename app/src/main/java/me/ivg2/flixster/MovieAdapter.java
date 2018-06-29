@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
@@ -52,11 +53,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         holder.tvOverview.setText(movie.getOverview());
 
         //build url for movie poster
-        String imageUrl = config.getImageUrl(/*config.getPosterSize()*/"", movie.getPosterPath());
+        String imageUrl = config.getImageUrl(config.getPosterSize(), movie.getPosterPath());
 
         RequestOptions options = RequestOptions.placeholderOf(R.drawable.flicks_movie_placeholder)
                 .error(R.drawable.flicks_movie_placeholder)
-                .fitCenter();
+                .fitCenter()
+                .transforms(new RoundedCorners(10));
 
         //load the image using glide
         Glide.with(context)
