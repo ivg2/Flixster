@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,14 +11,18 @@
         android:layout_height="135dp"
         app:srcCompat="@android:color/black"
         tools:layout_editor_absoluteX="3dp"
-        tools:layout_editor_absoluteY="2dp" />
+        tools:layout_editor_absoluteY="2dp"
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="294dp"
         android:layout_height="34dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
         android:text="Movie Title"
         android:textAppearance="@android:style/TextAppearance.Large"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="93dp"
         tools:layout_editor_absoluteY="-2dp" />
 
@@ -26,7 +30,10 @@
         android:id="@+id/tvOverview"
         android:layout_width="289dp"
         android:layout_height="110dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:text="Description of the movie"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="95dp"
         tools:layout_editor_absoluteY="27dp" />
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

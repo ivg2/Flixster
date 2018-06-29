@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
+import me.ivg2.flixster.models.Config;
 import me.ivg2.flixster.models.Movie;
 
 public class MovieListActivity extends AppCompatActivity {
@@ -30,15 +31,13 @@ public class MovieListActivity extends AppCompatActivity {
     public final static String TAG = "MovieListActivity";
 
     AsyncHttpClient client;
-    //the base URL for loading images
-    String imageBaseUrl;
-    //the poster size to use when fetching images, appended to url
-    String posterSize;
 
     ArrayList<Movie> movies;
 
     RecyclerView rvMovies;
     MovieAdapter adapter;
+
+    Config config;
 
 
     @Override
@@ -74,17 +73,13 @@ public class MovieListActivity extends AppCompatActivity {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 //get the values from the JSON response - both url and poster size
                 try {
-                    //parse the image JSON object
-                    JSONObject images = response.getJSONObject("images");
-
-                    imageBaseUrl = images.getString("secure_base_url");
-
-                    //use the option at index 3 or the w342 if necessary
-                    JSONArray posterSizeOptions = images.getJSONArray("poster_sizes");
-                    posterSize = posterSizeOptions.optString(3, "w342");
+                    config = new Config(response);
 
                     Log.i(TAG, String.format("Loaded configuration with imageBaseUrl %s and " +
-                            "posterSize %s", imageBaseUrl, posterSize));
+                            "posterSize %s", config.getImageBaseUrl(), config.getPosterSize()));
+
+                    //pass config to adapter
+                    adapter.setConfig(config);
 
                     getNowPlaying();
 
