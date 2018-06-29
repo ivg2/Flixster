@@ -52,15 +52,17 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         holder.tvOverview.setText(movie.getOverview());
 
         //build url for movie poster
-        String imageUrl = config.getImageUrl(config.getPosterSize(), movie.getPosterPath());
+        String imageUrl = config.getImageUrl(/*config.getPosterSize()*/"", movie.getPosterPath());
+
+        RequestOptions options = RequestOptions.placeholderOf(R.drawable.flicks_movie_placeholder)
+                .error(R.drawable.flicks_movie_placeholder)
+                .fitCenter();
 
         //load the image using glide
         Glide.with(context)
                 .load(imageUrl)
-                .apply(RequestOptions.placeholderOf(R.drawable.ic_launcher_background)
-                .error(R.drawable.ic_launcher_background)
-                .fitCenter()
-                ).into(holder.ivPosterImage);
+                .apply(options)
+                .into(holder.ivPosterImage);
     }
 
     //returns the total number of items in the list
