@@ -1,6 +1,7 @@
 package me.ivg2.flixster;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -52,11 +53,24 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         holder.tvTitle.setText(movie.getTitle());
         holder.tvOverview.setText(movie.getOverview());
 
-        //build url for movie poster
-        String imageUrl = config.getImageUrl(config.getPosterSize(), movie.getPosterPath());
+        //determine current orientation
+        boolean isPortrait = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
 
-        RequestOptions options = RequestOptions.placeholderOf(R.drawable.flicks_movie_placeholder)
-                .error(R.drawable.flicks_movie_placeholder)
+        String imageUrl = null;
+
+        //change url based on orientation
+        if(isPortrait) {
+            imageUrl = config.getImageUrl(config.getPosterSize(), movie.getPosterPath());
+        } else {
+            imageUrl = config.getImageUrl(config.getBackdropSize(), movie.getBackdropPath());
+        }
+
+        //get the correct placeholder and imageview for orientation
+        int placeholderId = isPortrait ? R.drawable.flicks_movie_placeholder : R.drawable.flicks_backdrop_placeholder;
+        ImageView imageView = isPortrait ? holder.ivPosterImage : holder.ivBackdropImage;
+
+        RequestOptions options = RequestOptions.placeholderOf(placeholderId)
+                .error(placeholderId)
                 .fitCenter()
                 .transforms(new RoundedCorners(10));
 
@@ -64,7 +78,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         Glide.with(context)
                 .load(imageUrl)
                 .apply(options)
-                .into(holder.ivPosterImage);
+                .into(imageView);
     }
 
     //returns the total number of items in the list
@@ -80,6 +94,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
         //track view objects
         ImageView ivPosterImage;
+        ImageView ivBackdropImage;
         TextView tvTitle;
         TextView tvOverview;
 
@@ -87,6 +102,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             super(itemView);
 
             ivPosterImage = itemView.findViewById(R.id.ivPosterImage);
+            ivBackdropImage = itemView.findViewById(R.id.ivBackdropImage);
             tvTitle = itemView.findViewById(R.id.textView);
             tvOverview = itemView.findViewById(R.id.tvOverview);
         }
