@@ -13,7 +13,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 import cz.msebera.android.httpclient.Header;
+import me.ivg2.flixster.models.Movie;
 
 public class MovieListActivity extends AppCompatActivity {
 
@@ -30,6 +33,8 @@ public class MovieListActivity extends AppCompatActivity {
     //the poster size to use when fetching images, appended to url
     String posterSize;
 
+    ArrayList<Movie> movies;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +42,7 @@ public class MovieListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_list);
 
         client = new AsyncHttpClient();
+        movies = new ArrayList<>();
 
         getConfiguration();
     }
@@ -51,6 +57,7 @@ public class MovieListActivity extends AppCompatActivity {
 
         //execute get request with an expected JSON object response
         client.get(url, params, new JsonHttpResponseHandler() {
+
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 //get the values from the JSON response - both url and poster size
@@ -63,6 +70,12 @@ public class MovieListActivity extends AppCompatActivity {
                     //use the option at index 3 or the w342 if necessary
                     JSONArray posterSizeOptions = images.getJSONArray("poster_sizes");
                     posterSize = posterSizeOptions.optString(3, "w342");
+
+                    Log.i(TAG, String.format("Loaded configuration with imageBaseUrl %s and " +
+                            "posterSize %s", imageBaseUrl, posterSize));
+
+                    getNowPlaying();
+
                 } catch (JSONException e) {
                     String errorMessage = "Failed parsing configuration";
                     logError(errorMessage, e, true);
@@ -72,6 +85,44 @@ public class MovieListActivity extends AppCompatActivity {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 String errorMessage = "Failed getting configuration";
+                logError(errorMessage, throwable, true);
+            }
+        });
+    }
+
+    /**
+     * get the list of currently playing movies from the API
+     */
+    private void getNowPlaying() {
+        String url = API_BASE_URL + "/movie/now_playing";
+        RequestParams params = new RequestParams();
+        params.put(API_KEY_PARAM, getString(R.string.api_key));
+
+        client.get(url, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                //load the results from JSON to a movie object
+                try {
+                    JSONArray results = response.getJSONArray("results");
+
+                    //iterate through results and append to movies arraylist
+                    for(int i = 0; i < results.length(); i++) {
+                        Movie movie = new Movie(results.getJSONObject(i));
+                        movies.add(movie);
+                    }
+
+                    Log.i(TAG, String.format("Loaded %s movies", results.length()));
+
+                } catch (JSONException e) {
+                    String errorMessage = "Failed to parse now playing movies";
+                    logError(errorMessage, e, true);
+                }
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                String errorMessage = "Failed to get data from now playing endpoint";
                 logError(errorMessage, throwable, true);
             }
         });
